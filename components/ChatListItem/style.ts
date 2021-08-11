@@ -4,6 +4,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         width:"100%",
+        flex: 1,
         justifyContent: 'space-between',
         padding: 10,
     },
@@ -28,6 +29,8 @@ const styles = StyleSheet.create({
     lastMessage: {
         fontSize: 16,
         color: 'gray',
+       
+        
     },
     time: {
         fontSize: 16,
