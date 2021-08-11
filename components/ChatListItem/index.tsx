@@ -1,8 +1,14 @@
 import React from 'react';
-import { View, Text, Image } from "react-native"
+import { View,
+         Text,
+         Image, 
+         TouchableWithoutFeedback
+         } from "react-native"
 import { ChatRoom } from '../../types';
 import styles from './style';
 import moment from 'moment';
+import { useNavigation } from '@react-navigation/native';
+import Navigation from '../../navigation';
 
 export type ChatListItemProps = {
     chatRoom: ChatRoom;
@@ -10,19 +16,32 @@ export type ChatListItemProps = {
 
 const ChatListItem = (props: ChatListItemProps) => {
     const { chatRoom } = props;
-
-    const user = chatRoom.users[1];
     
+    const user = chatRoom.users[1];
+
+    const navigation = useNavigation();
+
+    const onClick = () => {
+        // console.warn('Clicked on ${user.name}')
+        navigation.navigate('ChatRoom', { 
+            id: chatRoom.id,
+            name: user.name,
+        })
+        
+    }
+
+
 
     return (
-        <View style={styles.container}>
-            <View style ={ styles.leftContainer}>
-                <Image source = {{uri: user.imageUri}} style = { styles.avatar}/>  
+        <TouchableWithoutFeedback onPress={onClick}>
+              <View style={styles.container}>
+                <View style ={ styles.leftContainer}>
+                 <Image source = {{uri: user.imageUri}} style = { styles.avatar}/>  
           
-                <View style={styles.midContainer}>
+                 <View style={styles.midContainer}>
                     <Text style={styles.username}>{user.name}</Text>
                     <Text style={styles.lastMessage}>{chatRoom.lastMessage.content}</Text>
-                </View>
+                 </View>
             </View>
 
              <Text style = {styles.time}>
@@ -30,6 +49,9 @@ const ChatListItem = (props: ChatListItemProps) => {
              </Text>
 
         </View>
+
+        </TouchableWithoutFeedback>
+      
     )
 };
 

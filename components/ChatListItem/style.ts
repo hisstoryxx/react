@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     lastMessage: {
         fontSize: 16,
         color: 'gray',
+        flexWrap:'wrap',
        
         
     },
