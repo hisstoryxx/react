@@ -71,11 +71,12 @@ export default [{
   }, {
     id: 'u6',
     name: 'Elon Musk',
-    imageUri: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/5.jpg',
+    imageUri: 'https://i2.ruliweb.com/img/21/05/01/17926e7873d4f7ae6.jpeg',
+    
   }],
   lastMessage: {
     id: 'm5',
-    content: 'I would be happy',
+    content: '먹태 먹을 끄니까아',
     createdAt: '2020-09-30T14:48:00.000Z',
   }
 }, {
