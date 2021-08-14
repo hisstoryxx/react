@@ -45,7 +45,6 @@ function App() {
       console.log(userInfo);
 
       if (userInfo) {
-        // get the user from Bacend with the user SUB from Auth
         const userData = await API.graphql(
           graphqlOperation(
             getUser,

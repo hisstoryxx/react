@@ -5,7 +5,7 @@ import styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
-const NewMwssageButton = () => {
+const NewMessageButton = () => {
 
     const navigation = useNavigation();
 
@@ -23,9 +23,9 @@ const NewMwssageButton = () => {
                         color = "white"
                     />
                 </TouchableOpacity>
-               </View>
+            </View>
     
     )
 }
 
-export default NewMwssageButton;
+export default NewMessageButton;

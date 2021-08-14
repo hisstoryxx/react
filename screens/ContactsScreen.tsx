@@ -1,17 +1,39 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
-
+import { FlatList, StyleSheet } from 'react-native';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { View } from '../components/Themed';
 import ContactListItem from '../components/ContactListItem';
 
-import users from '../data/Users';
-import { FlatList } from 'react-native-gesture-handler';
+import  users  from '../data/Users';
+import { listUsers } from '../src/graphql/queries';
 import NewMessageButton from '../components/NewMessageButton';
+import { useEffect, useState } from 'react';
+import { API, graphqlOperation, } from 'aws-amplify';
 
 
 
-export default function ChatsScreen() {
+export default function ContactsScreen() {
+
+  const [users, setUsers] = useState( [] );
+  useEffect( () =>{
+    const fetchUsers = async () => {
+      try{
+        const usersData = await API.graphql(
+          graphqlOperation(
+            listUsers
+          )
+        )
+        setUsers(usersData.data.listUsers.items);
+      } catch(e){
+        console.log(e);
+
+      }
+
+    }
+    fetchUsers();
+
+  },[])
+  
   return (
     <View style={styles.container}>
       <FlatList
