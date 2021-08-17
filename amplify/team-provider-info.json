@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-chobal-dev-173405-authRole",
+      "UnauthRoleArn": "arn:aws:iam::368757887796:role/amplify-chobal-dev-173405-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::368757887796:role/amplify-chobal-dev-173405-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-chobal-dev-173405-deployment",
+      "UnauthRoleName": "amplify-chobal-dev-173405-unauthRole",
+      "StackName": "amplify-chobal-dev-173405",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:368757887796:stack/amplify-chobal-dev-173405/e47d2b50-ff35-11eb-851c-0682d24ebb8c",
+      "AmplifyAppId": "d34e1jxnlz47gw"
+    }
+  }
+}
