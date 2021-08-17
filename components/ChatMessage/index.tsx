@@ -5,9 +5,11 @@ import moment from "moment";
 import styles from './styles';
 
 
-export type ChatMessageProps = {
-    message : Message;
-}
+type NewType = {
+    message: Message;
+};
+
+export type ChatMessageProps = NewType
 const ChatMessage = (props: ChatMessageProps) => {
     const { message } = props;
 
