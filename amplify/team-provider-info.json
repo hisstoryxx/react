@@ -14,6 +14,12 @@
     "categories": {
       "auth": {
         "1010": {}
+      },
+      "function": {
+        "1010PostConfirmation": {
+          "deploymentBucketName": "amplify-1010-staging-55024-deployment",
+          "s3Key": "amplify-builds/1010PostConfirmation-6479374e787a63674652-build.zip"
+        }
       }
     }
   }
