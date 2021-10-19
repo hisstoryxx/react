@@ -14,6 +14,12 @@
     "categories": {
       "auth": {
         "1019": {}
+      },
+      "function": {
+        "1019PostAuthentication": {
+          "deploymentBucketName": "amplify-1019-staging-25858-deployment",
+          "s3Key": "amplify-builds/1019PostAuthentication-49686f37326d3064522f-build.zip"
+        }
       }
     }
   }
