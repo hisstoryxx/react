@@ -70,5 +70,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
+  },
+  "storage": {
+    "s358fcbb34": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation"
+    }
   }
 }
