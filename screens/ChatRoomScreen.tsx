@@ -66,7 +66,7 @@ export default function ChatRoomScreen() {
 
   
 
-  navigation.setOptions({title: 'Elon Musk'})
+  
 
   if (!chatRoom) {
     return <ActivityIndicator/>
