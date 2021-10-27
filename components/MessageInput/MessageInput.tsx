@@ -18,6 +18,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome } from '@expo/vector-icons';
 import { ScreenStackHeaderBackButtonImage } from 'react-native-screens';
 
+import 'react-native-get-random-values';
+import { v4 as uuidv4} from 'uuid';
+
+
 const MessageInput = ({chatRoom}) => {
   const [message, setMessage] = useState("");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
@@ -53,8 +57,7 @@ const MessageInput = ({chatRoom}) => {
 
     updateLastMessage(newMessage);
 
-    setMessage("");
-    setIsEmojiPickerOpen(false);
+    resetFields();
   }
 
   const updateLastMessage = async (newMessage) => { 
@@ -77,6 +80,12 @@ const MessageInput = ({chatRoom}) => {
     }
   }
 
+  const resetFields = () => {
+    setMessage("");
+    setIsEmojiPickerOpen(false);
+    setImage(null);
+  }
+
   // Image picker
 
   const pickImage = async () => {
@@ -84,7 +93,7 @@ const MessageInput = ({chatRoom}) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
     });
 
     if (!result.cancelled) {
@@ -109,7 +118,23 @@ const MessageInput = ({chatRoom}) => {
       return;
     }
     const blob = await getImageBlob();
-    await Storage.put("test.png", blob);
+    const { key } = await Storage.put(`${uuidv4()}.png`, blob);
+    
+
+    
+      // // send message
+      const user = await Auth.currentAuthenticatedUser();
+      const newMessage = await DataStore.save(new Message({
+        content: message,
+        image: key,
+        userID: user.attributes.sub,
+        chatroomID: chatRoom.id,
+      })
+      );
+  
+      updateLastMessage(newMessage);
+  
+      resetFields();
   };
 
   const getImageBlob = async () => {

@@ -2,12 +2,11 @@ import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { DataStore } from '@aws-amplify/datastore';
 import { User } from '../../src/models';
-import Auth from '@aws-amplify/auth';
+import { Auth }  from 'aws-amplify';
+import { S3Image } from 'aws-amplify-react-native';
 
 const blue = '#3777f0';
 const grey = 'lightgrey';
-
-const myID = 'u1';
 
 const Message = ({ message }) => {
   const [user, setUser] = useState<User|undefined>(undefined);
@@ -34,7 +33,22 @@ const Message = ({ message }) => {
 
   
   return (
-    <View style={[styles.container, isMe ? styles.rightContainer : styles.leftContainer]}>
+    <View 
+      style={[
+          styles.container, 
+          isMe ? styles.rightContainer : styles.leftContainer
+          ]}
+        >
+          {message.image && (
+            <View style = {{ marginBottom: 10}} >
+              <S3Image 
+                imgKey = {message.image} 
+                style = {{width: "100%", aspectRatio: 4/3}}
+                resizeMode = "contain"
+                />
+            </View>
+            
+          )}
       <Text style={{ color: isMe ? 'black' : 'white'}}>{message.content}</Text>
     </View>
   )
