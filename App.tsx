@@ -10,6 +10,10 @@ import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['Setting a timer'])
+
 Amplify.configure(config);
 
 function App() {
@@ -18,7 +22,7 @@ function App() {
 
   Auth.currentAuthenticatedUser().then(console.log);
 
-  
+
 
   if (!isLoadingComplete) {
     return null;
