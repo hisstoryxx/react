@@ -1,22 +1,22 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { DataStore } from '@aws-amplify/datastore';
 import { User } from '../../src/models';
-import { Auth }  from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 import { S3Image } from 'aws-amplify-react-native';
 
 const blue = '#3777f0';
 const grey = 'lightgrey';
 
 const Message = ({ message }) => {
-  const [user, setUser] = useState<User|undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
   const [isMe, setIsMe] = useState<boolean>(false);
 
-  useEffect(( ) => {
+  useEffect(() => {
     DataStore.query(User, message.userID).then(setUser);
   }, []);
 
-  useEffect( () => {
+  useEffect(() => {
     const checkIfMe = async () => {
       if (!user) {
         return;
@@ -25,31 +25,36 @@ const Message = ({ message }) => {
       setIsMe(user.id === authUser.attributes.sub)
     }
     checkIfMe();
-  },[user])
+  }, [user])
 
   if (!user) {
-    return < ActivityIndicator /> 
+    return < ActivityIndicator />
   }
 
-  
+
   return (
-    <View 
+    <View
       style={[
-          styles.container, 
-          isMe ? styles.rightContainer : styles.leftContainer
-          ]}
-        >
-          {message.image && (
-            <View style = {{ marginBottom: 10}} >
-              <S3Image 
-                imgKey = {message.image} 
-                style = {{width: "100%", aspectRatio: 4/3}}
-                resizeMode = "contain"
-                />
-            </View>
-            
-          )}
-      <Text style={{ color: isMe ? 'black' : 'white'}}>{message.content}</Text>
+        styles.container,
+        isMe ? styles.rightContainer : styles.leftContainer
+      ]}
+    >
+      {message.image && (
+        <View style={{ marginBottom: message.content ? 10 : 0 }} >
+          <S3Image
+            imgKey={message.image}
+            style={{ width: "100%", aspectRatio: 4 / 3 }}
+            resizeMode="contain"
+          />
+        </View>
+
+      )}
+      {!!message.content && (
+        <Text style={{ color: isMe ? 'black' : 'white' }}>
+          {message.content}
+        </Text>
+      )}
+
     </View>
   )
 }
