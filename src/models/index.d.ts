@@ -40,6 +40,7 @@ export declare class Message {
   readonly chatroomID?: string;
   readonly image?: string;
   readonly audio?: string;
+  readonly status?: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
   constructor(init: ModelInit<Message, MessageMetaData>);

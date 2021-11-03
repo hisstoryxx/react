@@ -26,7 +26,7 @@ export default function ChatRoomScreen() {
 
   useEffect( () => { 
     const subscription = DataStore.observe(MessageModel).subscribe(msg => {
-      console.log(msg.model, msg.opType, msg.element);
+      //console.log(msg.model, msg.opType, msg.element);
       if (msg.model === MessageModel && msg.opType === 'INSERT'){
         setMessages(existingMessages => [msg.element,...existingMessages])
       }
@@ -60,7 +60,7 @@ export default function ChatRoomScreen() {
         sort: message => message.createdAt(SortDirection.DESCENDING)
       }
     );
-    console.log(fetchedMessages);
+    // console.log(fetchedMessages);
     setMessages(fetchedMessages);
   };
 

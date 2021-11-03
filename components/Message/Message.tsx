@@ -1,22 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { DataStore } from '@aws-amplify/datastore';
-import { User } from '../../src/models';
+import { User, Message as MessageModel } from '../../src/models';
 import { Auth, Storage } from 'aws-amplify';
 import { S3Image } from 'aws-amplify-react-native';
 import AudioPlayer from '../AudioPlayer';
 
+import { Ionicons } from '@expo/vector-icons';
+
 const blue = '#3777f0';
 const grey = 'lightgrey';
 
-const Message = ({ message }) => {
+const Message = (props) => {
+  const [message, setMessage] = useState<MessageModel>(props.message);
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [isMe, setIsMe] = useState<boolean>(false);
+  const [isMe, setIsMe] = useState<boolean | null>(null);
   const [soundURI, setSoundURI] = useState<string | any>(null);
 
   useEffect(() => {
     DataStore.query(User, message.userID).then(setUser);
   }, []);
+
+  useEffect( () => { 
+    const subscription = DataStore.observe(MessageModel, message.id).subscribe(msg => {
+      if (msg.model === MessageModel && msg.opType === 'UPDATE'){
+        setMessage((message) => ({...message, ...msg.element}));
+      }
+    }); // Real time 
+    
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(()=> {
+    setAsRead();
+  },[isMe, message]);
 
   useEffect(() => {
     if (message.audio) {
@@ -34,6 +51,14 @@ const Message = ({ message }) => {
     }
     checkIfMe();
   }, [user]);
+
+  const setAsRead = async () => { 
+    if (isMe === false && message.status !== "READ"){
+      await DataStore.save(MessageModel.copyOf(message, (updated) => {
+        updated.status = "READ"
+      }));
+    }
+  }
 
 
 
@@ -58,15 +83,21 @@ const Message = ({ message }) => {
             resizeMode="contain"
           />
         </View>
-
       )}
       {soundURI && (<AudioPlayer soundURI={soundURI} />)}
       {!!message.content && (
         <Text style={{ color: isMe ? 'black' : 'white' }}>
-          {message.content}
+          {message.content} 
         </Text>
       )}
 
+    {isMe && !!message.status && message.status !== "SENT"  && ( 
+          <Ionicons  
+            name={message.status === 'DELIVERED' ? "checkmark" : "checkmark-done"} 
+            size={16} 
+            color="gray" 
+            style = {{ marginHorizontal: 5}} />) }
+            
     </View>
   )
 }
@@ -77,6 +108,8 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
     maxWidth: '75%',
+    flexDirection: 'row',
+    alignItems: "flex-end"
   },
   leftContainer: {
     backgroundColor: blue,
