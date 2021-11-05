@@ -13,7 +13,8 @@ const blue = '#3777f0';
 const grey = 'lightgrey';
 
 const Message = (props) => {
-  const { setAsMessageReply , message: propMessage} = props;
+  
+  const { setAsMessageRely , message: propMessage} = props;
 
   const [message, setMessage] = useState<MessageModel>(propMessage);
   const [repliedTo, setRepliedTo] = useState<MessageModel|undefined>(undefined);
@@ -87,7 +88,7 @@ const Message = (props) => {
 
     <Pressable
       
-      onLongPress = {setAsMessageReply}
+      onLongPress = {setAsMessageRely}
       style={[
         styles.container,
         isMe ? styles.rightContainer : styles.leftContainer,
