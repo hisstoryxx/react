@@ -10,6 +10,7 @@ import { ChatRoom } from '../src/models';
 
 export default function ChatRoomScreen() {
   const [messages, setMessages] = useState<MessageModel[]>([]);
+  const [messageReplyTo, setMessageReplyTo] = useState<MessageModel| null>(null);
   const [chatRoom, setChatRoom] = useState<ChatRoom|null>(null);
 
   const route = useRoute();
@@ -31,6 +32,7 @@ export default function ChatRoomScreen() {
         setMessages(existingMessages => [msg.element,...existingMessages])
       }
     }); // Real time 
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -51,6 +53,7 @@ export default function ChatRoomScreen() {
 
 
   const fetchMessages = async () => {
+
     if (!chatRoom){
       return;
     }
@@ -66,20 +69,23 @@ export default function ChatRoomScreen() {
 
   
 
-  
-
   if (!chatRoom) {
     return <ActivityIndicator/>
   }
+
+  console.log(messageReplyTo?.content)
 
   return (
     <SafeAreaView style={styles.page}>
       <FlatList
         data={messages}
-        renderItem={({ item}) => <Message message={item} />}
+        renderItem={({ item }) => 
+          <Message 
+            message={item} 
+            setAsMessageRely = {() => setMessageReplyTo(item) } />}
         inverted
       />
-      <MessageInput chatRoom = { chatRoom} />
+      <MessageInput chatRoom = { chatRoom} messageReplyTo={messageReplyTo} removeMessageReplyTo={()=> setMessageReplyTo(null)}   />
     </SafeAreaView>
   )
 };
