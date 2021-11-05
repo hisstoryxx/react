@@ -4,6 +4,8 @@ import { Feather } from "@expo/vector-icons";
 import { Auth, DataStore } from "aws-amplify";
 import { ChatRoomUser, User } from "../src/models";
 
+import moment from 'moment';
+
 
 
 const ChatRoomHeader = ({ id, children }) => {
@@ -28,6 +30,20 @@ const ChatRoomHeader = ({ id, children }) => {
       };
       fetchUsers();
      },[]);
+
+     const getLastOnlineText = () => {
+       if (!user?.lastOnlineAt){
+         return null;
+       }
+       // if lastOnlineAt is less than 5 minutes ago, show him as ONLINE
+       const lastOnlineDiffMS = moment().diff(moment(user?.lastOnlineAt));
+       if (lastOnlineDiffMS < 5 * 60 * 1000) { // less than 5 miniutes
+        return 'online'
+       } else {
+         return `Last seen online ${moment(user.lastOnlineAt).fromNow()}`;
+       }
+      
+     }
   
     return (
       <View style={{ 
@@ -44,9 +60,14 @@ const ChatRoomHeader = ({ id, children }) => {
           }}
           style={{ width: 30, height: 30, borderRadius: 30}}
         />
-        <Text style={{flex: 1, marginLeft: 10, fontWeight: 'bold'}}>
-          {user?.name}
+
+        <View style = {{flex:1 , marginLeft: 10}}>
+          <Text style={{ fontWeight: 'bold'}}>
+            {user?.name}
           </Text>
+          <Text>{getLastOnlineText()}</Text>
+        </View>
+        
         <Feather 
           name="camera" 
           size={24} 

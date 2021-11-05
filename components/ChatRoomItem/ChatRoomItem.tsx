@@ -7,6 +7,8 @@ import styles from './styles';
 import { AWS_CLOUDWATCH_BASE_BUFFER_SIZE } from '@aws-amplify/core';
 import Auth from '@aws-amplify/auth';
 
+import moment from 'moment';
+
 export default function ChatRoomItem({ chatRoom }) {
   // const [users,setUsers] = useState<User[]>([]); // all users in this chatroom
   const [user, setUser] = useState<User|null>(null); // the display user
@@ -48,6 +50,8 @@ export default function ChatRoomItem({ chatRoom }) {
     return <ActivityIndicator color = 'red' />
   }
 
+  const time = moment(lastMessage?.createdAt).from(moment());
+
   return (
     <Pressable onPress={onPress} style={styles.container}>
       <Image source={{ uri: user.imageUr}} style={styles.image} />
@@ -59,7 +63,7 @@ export default function ChatRoomItem({ chatRoom }) {
       <View style={styles.rightContainer}>
         <View style={styles.row}>
           <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.text}>{lastMessage?.createdAt}</Text>
+          <Text style={styles.text}>{time}</Text>
         </View>
         <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text>
       </View>
