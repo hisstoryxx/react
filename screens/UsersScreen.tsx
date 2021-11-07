@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { View, StyleSheet, FlatList, Text, Pressable, SafeAreaView } from 'react-native';
+import { View, StyleSheet, FlatList, Text, Pressable, SafeAreaView, Alert } from 'react-native';
 import UserItem from '../components/UserItem';
 
 import Users from '../assets/dummy-data/Users';
@@ -41,15 +41,24 @@ export default function UsersScreen() {
   }
 
   const createChatRoom = async (users) => {
+    // ToDo if there is already a chat room between these 2 users
+    // then redirect to the existing chat room
+    // otherwise, create a new chatroom with these users.
 
     // connect authenticated user with the chat room
     const authUser = await Auth.currentAuthenticatedUser();
+    console.log(authUser);
     const dbUser = await DataStore.query(User, authUser.attributes.sub);
+    console.log(dbUser);
+    if (!dbUser){
+      Alert.alert("There was an error creating the group");
+      return;
+    }
 
     // Create a chat room
     const newChatRoomData = {
       newMessages: 0,
-      admin: dbUser,
+      Admin: dbUser,
     };
     if (users.length > 1) {
       newChatRoomData.name = "New group";
