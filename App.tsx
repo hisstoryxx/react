@@ -6,6 +6,7 @@ import Amplify, { Auth, DataStore, Hub } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
 import config from './src/aws-exports';
 import { Message, User } from './src/models';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
@@ -15,9 +16,24 @@ import { LogBox } from 'react-native';
 import { ForceTouchGestureHandler } from 'react-native-gesture-handler';
 import moment from 'moment';
 
+import { secretbox, randomBytes, box } from "tweetnacl";
+import { getRandomBytes } from 'expo-random';
+import { PRNG, generateKeyPair, encrypt, decrypt } from './utills/crypto';
+
 LogBox.ignoreLogs(['Setting a timer'])
 
 Amplify.configure(config);
+
+const obj = { hello: 'world' };
+const pairA = generateKeyPair();  // userA 
+const pairB = generateKeyPair();  // userB
+
+const sharedA = box.before(pairB.publicKey, pairA.secretKey);
+const encrypted = encrypt(sharedA, obj);
+
+const sharedB = box.before(pairA.publicKey, pairB.secretKey);
+const decrypted = decrypt(sharedB, encrypted);
+console.log(obj, encrypted, decrypted);
 
 function App() {
   const isLoadingComplete = useCachedResources();
@@ -101,8 +117,10 @@ function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+        <ActionSheetProvider>
+          <Navigation colorScheme={"light"} />
+        </ActionSheetProvider>
+        <StatusBar /> 
       </SafeAreaProvider>
     );
   }

@@ -69,6 +69,8 @@ export default function ChatRoomScreen() {
 
   
 
+  
+
   if (!chatRoom) {
     return <ActivityIndicator/>
   }
@@ -82,7 +84,8 @@ export default function ChatRoomScreen() {
         renderItem={({ item }) => 
           <Message 
             message={item} 
-            setAsMessageRely = {() => setMessageReplyTo(item) } />}
+            setAsMessageRely = {() => setMessageReplyTo(item)}
+             />}
         inverted
       />
       <MessageInput chatRoom = { chatRoom} messageReplyTo={messageReplyTo} removeMessageReplyTo={()=> setMessageReplyTo(null)}   />

@@ -16,6 +16,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
 import HomeScreen from '../screens/HomeScreen';
 import UsersScreen from '../screens/UsersScreen';
+import SettingsScreen from '../screens/Settings';
 
 import ChatRoomHeader from './ChatRoomHeader';
 import GroupInfoScreen from '../screens/GroupInfoScreen';
@@ -59,7 +60,9 @@ function RootNavigator() {
           title: "Users",
         }} 
       />
+      <Stack.Screen name = "Settings" component={SettingsScreen} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      
     </Stack.Navigator>
   );
 }
@@ -81,7 +84,11 @@ const HomeHeader = (props) => {
         style={{ width: 30, height: 30, borderRadius: 30}}
       />
       <Text style={{flex: 1, textAlign: 'center', marginLeft: 50, fontWeight: 'bold'}}>Signal</Text>
-      <Feather name="camera" size={24} color="black" style={{ marginHorizontal: 10}} />
+      
+      <Pressable onPress ={() => navigation.navigate('Settings')}>
+        <Feather name="settings" size={24} color="black" style={{ marginHorizontal: 10}} />
+      </Pressable>
+      
       <Pressable onPress ={() => navigation.navigate('UsersScreen')}>
         <Feather name="edit-2" size={24} color="black" style={{ marginHorizontal: 10}} />
       </Pressable>

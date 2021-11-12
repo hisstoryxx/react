@@ -66,6 +66,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "publicKey": {
+                    "name": "publicKey",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -168,6 +175,19 @@ export const schema = {
                     "type": "ID",
                     "isRequired": false,
                     "attributes": []
+                },
+                "ForUser": {
+                    "name": "ForUser",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetName": "messageForUserId"
+                    }
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -477,5 +497,5 @@ export const schema = {
         }
     },
     "nonModels": {},
-    "version": "6a9130a3ca2d80ab112a4c9cd139f1cd"
+    "version": "bccb07081ab5c9ac27320c62fa9103bf"
 };
