@@ -24,6 +24,7 @@ LogBox.ignoreLogs(['Setting a timer'])
 
 Amplify.configure(config);
 
+
 const obj = { hello: 'world' };
 const pairA = generateKeyPair();  // userA 
 const pairB = generateKeyPair();  // userB
