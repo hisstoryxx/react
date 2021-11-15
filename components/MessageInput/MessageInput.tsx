@@ -8,10 +8,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Alert,
 } from 'react-native';
 import { SimpleLineIcons, Feather, MaterialCommunityIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { DataStore } from '@aws-amplify/datastore'
-import { Message, ChatRoom } from '../../src/models';
+import { Message, ChatRoom, ChatRoomUser } from '../../src/models';
 import { Auth, Storage } from 'aws-amplify';
 import EmojiSelector from 'react-native-emoji-selector';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,6 +27,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import AudioPlayer from '../AudioPlayer';
 import MessageComponent from "../Message";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {PRIVATE_KEY} from '../../screens/Settings';
+import { useNavigation } from "@react-navigation/core";
 
 
 
@@ -37,6 +41,9 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const [soundURI, setSoundURI] = useState<string | null>(null);
+
+  const navigation = useNavigation();
+
 
 
   useEffect(() => {
@@ -58,20 +65,51 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
     })();
   }, []);
 
+  const sendMessageToUser = async (user, fromUserId) => {
+    // send message
+    const ourSecretKey = await AsyncStorage.getItem('PRIVATE_KEY');
+    if (!ourSecretKey) {
+      Alert.alert(
+        "You haven't set your keypair yet", 
+        "Go to settings, and generate a new keypair",
+      [
+        {
+        text: "Open setting",
+        onPress: () => navigation.navigate("Settings")
+      }, 
+      ]
+    );
+    return;
+    }
+    const sharedKey = box.before(user.publicKey, ourSecretKey);
+   
+    const newMessage = await DataStore.save(
+       new Message({
+         content: message,  // <- this messages should be encrypted
+         userID: fromUserId,
+         // forUserId: user.id,
+         chatroomID: chatRoom.id,
+         replyToMessageID: messageReplyTo?.id
+       })
+     );
+
+    // updateLastMessage(newMessage);
+  };
 
   const sendMessage = async () => {
-    // send message
-    const user = await Auth.currentAuthenticatedUser();
-    const newMessage = await DataStore.save(
-      new Message({
-        content: message,
-        userID: user.attributes.sub,
-        chatroomID: chatRoom.id,
-        status: "SENT",
-        replyToMessageID: messageReplyTo?.id
-    }))
+    // get all the users of this chatroom
+    const authUser = await Auth.currentAuthenticatedUser();
 
-    updateLastMessage(newMessage);
+    const users = (await DataStore.query(ChatRoomUser)).filter(
+      (cru) => cru.chatroom.id === chatRoom.id
+    ).map(cru => cru.user);
+
+    console.log("users", users);
+
+    // for each user, encrypt the 'content' with his public key, and save it as a new message
+    await Promise.all(users.map(user => sendMessageToUser(user, authUser.attributes.sub)));
+
+    
 
     resetFields();
   }
@@ -286,15 +324,13 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
             alignSelf: "flex-end"
           }}
           >
-            <View style={{
+          <View style={{
               height: 5,
               borderRadius: 5,
               backgroundColor: '#3777f0',
               width: `${progress * 100}%`,
 
             }} />
-
-
           </View>
 
 
