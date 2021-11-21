@@ -28,8 +28,11 @@ import { Audio, AVPlaybackStatus } from 'expo-av';
 import AudioPlayer from '../AudioPlayer';
 import MessageComponent from "../Message";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {PRIVATE_KEY} from '../../screens/Settings';
+
 import { useNavigation } from "@react-navigation/core";
+
+import { box } from 'tweetnacl';
+import { encrypt, getMySecretKey, stringToUint8Array } from '../../utills/crypto';
 
 
 
@@ -67,27 +70,36 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
 
   const sendMessageToUser = async (user, fromUserId) => {
     // send message
-    const ourSecretKey = await AsyncStorage.getItem('PRIVATE_KEY');
-    if (!ourSecretKey) {
+    const ourSecretKey = await getMySecretKey();
+    if (!ourSecretKey){
+      return;
+    }
+
+    if(!user.publicKey){
       Alert.alert(
-        "You haven't set your keypair yet", 
-        "Go to settings, and generate a new keypair",
-      [
-        {
-        text: "Open setting",
-        onPress: () => navigation.navigate("Settings")
-      }, 
-      ]
+        "The user haven't set his keypair yet", 
+        "Until the user generates the keypair, you cannot securely send him message",
     );
     return;
+
     }
-    const sharedKey = box.before(user.publicKey, ourSecretKey);
+
+    
+    console.log("Private key", ourSecretKey);
+
+    const sharedKey = box.before(
+      stringToUint8Array(user.publicKey), 
+      ourSecretKey);
+    console.log("shared key", sharedKey);
+
+    const encryptedMessage = encrypt(sharedKey, {message});
+    console.log("encrypted message", encryptedMessage);
    
     const newMessage = await DataStore.save(
        new Message({
-         content: message,  // <- this messages should be encrypted
+         content: encryptedMessage,  // <- this messages should be encrypted
          userID: fromUserId,
-         // forUserId: user.id,
+         forUserId: user.id,
          chatroomID: chatRoom.id,
          replyToMessageID: messageReplyTo?.id
        })

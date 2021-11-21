@@ -7,6 +7,7 @@ import Message from '../components/Message';
 
 import MessageInput from '../components/MessageInput';
 import { ChatRoom } from '../src/models';
+import Auth from '@aws-amplify/auth';
 
 export default function ChatRoomScreen() {
   const [messages, setMessages] = useState<MessageModel[]>([]);
@@ -57,8 +58,13 @@ export default function ChatRoomScreen() {
     if (!chatRoom){
       return;
     }
-    const fetchedMessages = await DataStore.query(MessageModel,
-      message => message.chatroomID("eq", chatRoom?.id),
+
+    const authUser = await Auth.currentAuthenticatedUser();
+    const myId = authUser.attributes.sub;
+    
+    const fetchedMessages = await DataStore.query(
+      MessageModel,
+      message => message.chatroomID("eq", chatRoom?.id).forUserId("eq", myId),
       {
         sort: message => message.createdAt(SortDirection.DESCENDING)
       }

@@ -32,6 +32,8 @@ const pairB = generateKeyPair();  // userB
 const sharedA = box.before(pairB.publicKey, pairA.secretKey);
 const encrypted = encrypt(sharedA, obj);
 
+console.log("sharedA",sharedA);
+
 const sharedB = box.before(pairA.publicKey, pairB.secretKey);
 const decrypted = decrypt(sharedB, encrypted);
 console.log(obj, encrypted, decrypted);
