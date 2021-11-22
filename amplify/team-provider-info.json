@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-gigi-dev-22555-authRole",
+      "UnauthRoleArn": "arn:aws:iam::368757887796:role/amplify-gigi-dev-22555-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::368757887796:role/amplify-gigi-dev-22555-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-gigi-dev-22555-deployment",
+      "UnauthRoleName": "amplify-gigi-dev-22555-unauthRole",
+      "StackName": "amplify-gigi-dev-22555",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:368757887796:stack/amplify-gigi-dev-22555/41c168b0-4bb9-11ec-a5bc-02cbd2825da0",
+      "AmplifyAppId": "d3lhg3z7x9079m"
+    },
+    "categories": {
+      "auth": {
+        "gigib1693a03": {}
+      }
+    }
+  }
+}

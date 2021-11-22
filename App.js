@@ -1,21 +1,61 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {Text,View, StyleSheet, SafeAreaView} from 'react-native';
+import Amplify from 'aws-amplify';
+import awsconfig from './src/aws-exports';
+import { 
+  Authenticator, 
+  SignIn, 
+  ConfirmSignUP, 
+  ConfirmSignIn, 
+  ForgotPassword } from 'aws-amplify-react-native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+import SignUp from './src/components/SignUp'
+import { render } from 'react-dom';
+
+Amplify.configure(awsconfig);
+
+console.disableYellowBox = true;
+
+const Home = (props) => {
+  if (props.authState === 'signedIn')
+  
+  return <Text>Home</Text>;
+  
+  else return <></>;
+};
+
+const App = () => {
+
+
+  return(
+    
+    <View style = {styles.container}>
+      <Authenticator 
+        usernameAttributes = "email" 
+        hideDefault= {true}
+        authState='signIn'
+        onStateChange={(authState) => console.log('authState', authState)}>
+
+      <Home/>
+       <SignUp/>
+       {/* <SignIn/>
+       <ConfirmSignUP/>
+       <ConfirmSignIn/>
+       <ForgotPassword/>  */}
+      </Authenticator>
     </View>
-  );
+    
+  )
+  
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+  container : {
+    flex:1,
     justifyContent: 'center',
-  },
-});
+    alignItems: 'center',
+  }
+})
+
+
+export default App
