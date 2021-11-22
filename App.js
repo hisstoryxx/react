@@ -1,21 +1,50 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react'
+import { StatusBar, ScrollView } from 'react-native'
+import Amplify from 'aws-amplify'
+import { Authenticator } from 'aws-amplify-react-native'
+import config from './src/aws-exports'
 
-export default function App() {
+import { AmplifyTheme } from './src/components'
+
+Amplify.configure({
+  ...config,
+  Analytics: {
+    disabled: true
+  }
+})
+
+const signUpConfig = {
+    hideAllDefaults: true,
+    signUpFields: [
+      {
+        label: 'Email',
+        key: 'email',
+        required: true,
+        displayOrder: 1,
+        type: 'string',
+      },
+      {
+        label: 'Password',
+        key: 'password',
+        required: true,
+        displayOrder: 2,
+        type: 'password',
+      },
+    ],
+  }
+  
+
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    <>
+    <ScrollView>
+      <StatusBar barStyle="dark-content" />
+      <Authenticator usernameAttributes="email" signUpConfig={signUpConfig} theme = {AmplifyTheme}  />
+    </ScrollView>
+    </>
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App
+
