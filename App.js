@@ -4,12 +4,20 @@ import Amplify from 'aws-amplify';
 import awsconfig from './src/aws-exports';
 import { 
   Authenticator, 
-  SignIn, 
-  ConfirmSignUP, 
-  ConfirmSignIn, 
-  ForgotPassword } from 'aws-amplify-react-native';
+  
+  SignIn,  
+  SignUp,
+  ConfirmSignUp,
+  ForgotPassword,
 
-import SignUp from './src/components/SignUp'
+  ConfirmSignIn, 
+   } from 'aws-amplify-react-native';
+
+// import SignUp from './src/components/SignUp'
+// import ConfirmSignUp from './src/components/ConfirmSignUp'
+// import ForgotPassword from './src/components/ForgotPassword';
+
+
 import { render } from 'react-dom';
 
 Amplify.configure(awsconfig);
@@ -31,17 +39,17 @@ const App = () => {
     
     <View style = {styles.container}>
       <Authenticator 
-        usernameAttributes = "email" 
+        
         hideDefault= {true}
         authState='signIn'
         onStateChange={(authState) => console.log('authState', authState)}>
 
-      <Home/>
-       <SignUp/>
-       {/* <SignIn/>
-       <ConfirmSignUP/>
-       <ConfirmSignIn/>
-       <ForgotPassword/>  */}
+        <Home/>
+        <SignUp/>
+        <SignIn/>
+        <ConfirmSignUp/>
+        <ConfirmSignIn/>
+        <ForgotPassword/>
       </Authenticator>
     </View>
     

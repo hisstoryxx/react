@@ -1,0 +1,14 @@
+[
+    {
+        "groupName": "phone",
+        "precedence": 1
+    },
+    {
+        "groupName": "usernamePhone",
+        "precedence": 2
+    },
+    {
+        "groupName": "no",
+        "precedence": 3
+    }
+]
