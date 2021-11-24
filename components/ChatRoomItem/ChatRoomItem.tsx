@@ -13,7 +13,7 @@ export default function ChatRoomItem({ chatRoom }) {
   // const [users,setUsers] = useState<User[]>([]); // all users in this chatroom
   const [user, setUser] = useState<User | null>(null); // the display user
   const [lastMessage, setLastMessage] = useState<Message | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState (true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigation = useNavigation();
 
@@ -56,7 +56,7 @@ export default function ChatRoomItem({ chatRoom }) {
 
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <Image source={{ uri: chatRoom.imageUri || user.imageUr }} style={styles.image} />
+      <Image source={{ uri: chatRoom.imageUri || user?.imageUr }} style={styles.image} />
 
       {!!chatRoom.newMessages && <View style={styles.badgeContainer}>
         <Text style={styles.badgeText}>{chatRoom.newMessages}</Text>
@@ -64,7 +64,7 @@ export default function ChatRoomItem({ chatRoom }) {
 
       <View style={styles.rightContainer}>
         <View style={styles.row}>
-          <Text style={styles.name}>{chatRoom.name || user.name}</Text>
+          <Text style={styles.name}>{chatRoom.name || user?.name}</Text>
           <Text style={styles.text}>{time}</Text>
         </View>
         <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text>

@@ -10,14 +10,18 @@ import { Ionicons } from '@expo/vector-icons';
 import MessageReply from '../MessageReply';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 
+import { box } from 'tweetnacl';
+import { decrypt, getMySecretKey, stringToUint8Array } from '../../utills/crypto';
+
 const blue = '#3777f0';
 const grey = 'lightgrey';
 
 const Message = (props) => {
-  const { setAsMessageRely , message: propMessage} = props;
+  const { setAsMessageRely, message: propMessage } = props;
 
   const [message, setMessage] = useState<MessageModel>(propMessage);
-  const [repliedTo, setRepliedTo] = useState<MessageModel|undefined>(undefined);
+  const [decrypteContent, setDecryptedContent] = useState("");
+  const [repliedTo, setRepliedTo] = useState<MessageModel | undefined>(undefined);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [isMe, setIsMe] = useState<boolean | null>(null);
   const [soundURI, setSoundURI] = useState<string | any>(null);
@@ -31,34 +35,34 @@ const Message = (props) => {
     DataStore.query(User, message.userID).then(setUser);
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     setMessage(propMessage);
   }, [propMessage])
 
-  useEffect(()=> {
+  useEffect(() => {
     if (message?.replyToMessageID) {
       DataStore.query(MessageModel, message.replyToMessageID).then(setRepliedTo);
     }
   }, [message])
 
-  useEffect( () => { 
+  useEffect(() => {
     const subscription = DataStore.observe(MessageModel, message.id).subscribe(msg => {
-      if (msg.model === MessageModel ){
-        if (msg.opType === 'UPDATE'){
-          setMessage((message) => ({...message, ...msg.element}));
-        } else if (msg.opType === "DELETE") { 
+      if (msg.model === MessageModel) {
+        if (msg.opType === 'UPDATE') {
+          setMessage((message) => ({ ...message, ...msg.element }));
+        } else if (msg.opType === "DELETE") {
           setIsDeleted(true);
         }
-        
+
       }
     }); // Real time 
-    
+
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     setAsRead();
-  },[isMe, message]);
+  }, [isMe, message]);
 
   useEffect(() => {
     if (message.audio) {
@@ -77,8 +81,31 @@ const Message = (props) => {
     checkIfMe();
   }, [user]);
 
-  const setAsRead = async () => { 
-    if (isMe === false && message.status !== "READ"){
+  useEffect(() => {
+    if (!message?.content || !user?.publicKey) {
+      return;
+    }
+    const decryptMessage = async () => {
+      const myKey = await getMySecretKey();
+      if (!myKey) {
+        return;
+      }
+      // decrypt message.content
+      const sharedKey = box.before(
+        stringToUint8Array(user?.publicKey),
+        myKey
+      );
+      console.log("sharedKey", sharedKey);
+      const decrypted = decrypt(sharedKey, message.content);
+      console.log("decrypted", decrypted);
+      setDecryptedContent(decrypted.message);
+    };
+
+    decryptMessage();
+  }, [message, user])
+
+  const setAsRead = async () => {
+    if (isMe === false && message.status !== "READ") {
       await DataStore.save(MessageModel.copyOf(message, (updated) => {
         updated.status = "READ"
       }));
@@ -86,37 +113,37 @@ const Message = (props) => {
   };
 
   const deleteMessage = async () => {
-    await DataStore.delete(message); 
+    await DataStore.delete(message);
   }
 
   const confirmDelete = () => {
     Alert.alert(
-    "Confirm delete", 
-    "Are you sure you want to delte the message?",
-    [
-      {
-        text: "Delete",
-        onPress: deleteMessage,
-        style : 'destructive',
-      },
-      {
-        text: "Cancel",
-      }
-    ]
+      "Confirm delete",
+      "Are you sure you want to delte the message?",
+      [
+        {
+          text: "Delete",
+          onPress: deleteMessage,
+          style: 'destructive',
+        },
+        {
+          text: "Cancel",
+        }
+      ]
     );
   };
 
-  const onActionPress = (index)=> {
-    
+  const onActionPress = (index) => {
+
 
     if (index === 0) {
       setAsMessageRely();
     } else if (index === 1) {
-      if(isMe) {
+      if (isMe) {
         confirmDelete();
-      } else { 
+      } else {
         Alert.alert("Can't perform action", "This is not your message");
-      } 
+      }
     }
   };
 
@@ -127,12 +154,12 @@ const Message = (props) => {
 
     showActionSheetWithOptions(
       {
-      options, 
-      destructiveButtonIndex, 
-      cancelButtonIndex,
+        options,
+        destructiveButtonIndex,
+        cancelButtonIndex,
       },
       onActionPress
-     );
+    );
   };
 
   if (!user) {
@@ -143,7 +170,7 @@ const Message = (props) => {
   return (
 
     <Pressable
-      onLongPress = {openActionMenu}
+      onLongPress={openActionMenu}
       style={[
         styles.container,
         isMe ? styles.rightContainer : styles.leftContainer,
@@ -152,32 +179,32 @@ const Message = (props) => {
     >
       {repliedTo && (<MessageReply message={repliedTo} />)}
 
-      <View style = {styles.row}>
+      <View style={styles.row}>
 
-      {message.image && (
-        <View style={{ marginBottom: message.content ? 10 : 0 }} >
-          <S3Image
-            imgKey={message.image}
-            style={{ width: "100%", aspectRatio: 4 / 3 }}
-            resizeMode="contain"
-          />
-        </View>
-      )}
-      {soundURI && (<AudioPlayer soundURI={soundURI} />)}
-      {!!message.content && (
-        <Text style={{ color: isMe ? 'black' : 'white' }}>
-          {isDeleted ? "message deleted" : message.content} 
-        </Text>
-      )}
+        {message.image && (
+          <View style={{ marginBottom: message.content ? 10 : 0 }} >
+            <S3Image
+              imgKey={message.image}
+              style={{ width: "100%", aspectRatio: 4 / 3 }}
+              resizeMode="contain"
+            />
+          </View>
+        )}
+        {soundURI && (<AudioPlayer soundURI={soundURI} />)}
+        {!!message.content && (
+          <Text style={{ color: isMe ? 'black' : 'white' }}>
+            {isDeleted ? "message deleted" : decrypteContent}
+          </Text>
+        )}
 
-    {isMe && !!message.status && message.status !== "SENT"  && ( 
-          <Ionicons  
-            name={message.status === 'DELIVERED' ? "checkmark" : "checkmark-done"} 
-            size={16} 
-            color="gray" 
-            style = {{ marginHorizontal: 5}} />) }
-    </View>
-            
+        {isMe && !!message.status && message.status !== "SENT" && (
+          <Ionicons
+            name={message.status === 'DELIVERED' ? "checkmark" : "checkmark-done"}
+            size={16}
+            color="gray"
+            style={{ marginHorizontal: 5 }} />)}
+      </View>
+
     </Pressable>
   )
 }
@@ -205,7 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: blue,
     marginLeft: 10,
     marginRight: 'auto'
-    
+
   },
   rightContainer: {
     backgroundColor: grey,

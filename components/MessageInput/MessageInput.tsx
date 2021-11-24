@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Alert,
 } from 'react-native';
 import { SimpleLineIcons, Feather, MaterialCommunityIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import { DataStore } from '@aws-amplify/datastore'
@@ -26,7 +27,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import AudioPlayer from '../AudioPlayer';
 import MessageComponent from "../Message";
+import { ChatRoomUser } from "../../src/models";
 
+
+
+import Navigation from '../../navigation';
+import { useNavigation } from '@react-navigation/core';
+
+import { box } from 'tweetnacl';
+import { encrypt, getMySecretKey, stringToUint8Array } from '../../utills/crypto';
 
 
 const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
@@ -37,6 +46,8 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const [soundURI, setSoundURI] = useState<string | null>(null);
+
+  const navigation = useNavigation();
 
 
   useEffect(() => {
@@ -59,19 +70,64 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
   }, []);
 
 
-  const sendMessage = async () => {
+  const sendMessageToUser = async (user, fromUserId) => {
+
     // send message
-    const user = await Auth.currentAuthenticatedUser();
+    const ourSecretKey = await getMySecretKey();
+    if (!ourSecretKey) {
+      return;
+    }
+
+    if (!user.publicKey) {
+      Alert.alert(
+        "The user haven't set his keypair yet",
+        "Until the user generate a new keypair, you cannot securely send him message",
+
+      );
+
+      return;
+    }
+
+    console.log("private", ourSecretKey);
+
+    const sharedKey = box.before(
+      stringToUint8Array(user.publicKey),
+      ourSecretKey);
+    console.log("sharedKey", sharedKey);
+
+    const encryptedMessage = encrypt(sharedKey, { message });
+    console.log("encrypted message", encryptedMessage);
+
     const newMessage = await DataStore.save(
       new Message({
-        content: message,
-        userID: user.attributes.sub,
-        chatroomID: chatRoom.id,
+        content: encryptedMessage,  // <- this messages should be encrypted
+        userID: fromUserId,
+        forUserId: user.id,
         status: "SENT",
+        chatroomID: chatRoom.id,
         replyToMessageID: messageReplyTo?.id
-    }))
+      }));
 
-    updateLastMessage(newMessage);
+    // updateLastMessage(newMessage);
+  };
+
+  const sendMessage = async () => {
+    // get all the users of this chatroom
+    const authuser = await Auth.currentAuthenticatedUser();
+
+    const users = (await DataStore.query(ChatRoomUser)).filter(
+      (cru) => cru.chatroom.id === chatRoom.id
+    ).map(cru => cru.user);
+
+    console.log("users", users);
+
+
+    // for each user, encrypt the 'content' with his public key, and save it as a new message
+    await Promise.all(users.map((user) => sendMessageToUser(user, authuser.attributes.sub)));
+
+
+
+
 
     resetFields();
   }
@@ -257,12 +313,12 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
     >
 
       {messageReplyTo && (
-        <View style = {{ backgroundColor: '#f2f2f2', padding: 5, flexDirection: 'row'}}> 
-          <View style= {{ flex:1}}>
+        <View style={{ backgroundColor: '#f2f2f2', padding: 5, flexDirection: 'row' }}>
+          <View style={{ flex: 1 }}>
             <Text>Reply to:</Text>
-            <MessageComponent message = {messageReplyTo} />
+            <MessageComponent message={messageReplyTo} />
           </View>
-        <Pressable onPress={() => removeMessageReplyTo()}>
+          <Pressable onPress={() => removeMessageReplyTo()}>
             <FontAwesome
               name="close"
               size={24}
@@ -270,9 +326,9 @@ const MessageInput = ({ chatRoom, messageReplyTo, removeMessageReplyTo }) => {
               style={{ margin: 5 }}
             />
           </Pressable>
-          
+
         </View>
-      ) }
+      )}
       {image && (
         <View style={styles.sendImageConatainer}>
           <Image

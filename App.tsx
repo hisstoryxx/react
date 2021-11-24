@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Amplify, { Auth, DataStore, Hub } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
@@ -22,8 +22,13 @@ import { PRNG, generateKeyPair, encrypt, decrypt } from './utills/crypto';
 
 LogBox.ignoreLogs(['Setting a timer'])
 
-Amplify.configure(config);
 
+Amplify.configure({
+  ...config,
+  Analytics: {
+    disabled: true,
+  },
+});
 
 const obj = { hello: 'world' };
 const pairA = generateKeyPair();  // userA 
@@ -42,14 +47,14 @@ function App() {
 
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(()=> {
+  useEffect(() => {
     // Create listener
     console.log("registering listener")
-  const listener = Hub.listen('datastore', async hubData => {
-    const  { event, data } = hubData.payload;
-    if (event === 'outboxMutationProcessed' 
-      && data.model === Message 
-      && !["DELIVERED", "READ"].includes(data.element.status)){
+    const listener = Hub.listen('datastore', async hubData => {
+      const { event, data } = hubData.payload;
+      if (event === 'outboxMutationProcessed'
+        && data.model === Message
+        && !["DELIVERED", "READ"].includes(data.element.status)) {
         // set the message status to delivered
         DataStore.save(
           Message.copyOf(data.element, (updated) => {
@@ -59,29 +64,29 @@ function App() {
       }
     });
 
-// Remove listener
-  return () => listener();
+    // Remove listener
+    return () => listener();
   }, []);
 
-  useEffect( () => { 
-    if(!user) {
-      return 
+  useEffect(() => {
+    if (!user) {
+      return
     }
     const subscription = DataStore.observe(User, user.id).subscribe(msg => {
-      if (msg.model === User && msg.opType === 'UPDATE'){
+      if (msg.model === User && msg.opType === 'UPDATE') {
         setUser(msg.element);
       }
     }); // Real time 
-    
+
     return () => subscription.unsubscribe();
   }, [user?.id]);
 
-  useEffect( ()=> {
+  useEffect(() => {
     fetchUser();
   }, [])
 
-  useEffect (()=> {
-    const interval = setInterval( async () => {
+  useEffect(() => {
+    const interval = setInterval(async () => {
       console.log("update last online");
       await updateLastOnline();
     }, 1 * 60 * 1000);  // 1분마다 updateLastOnline 확인 
@@ -121,7 +126,7 @@ function App() {
         <ActionSheetProvider>
           <Navigation colorScheme={"light"} />
         </ActionSheetProvider>
-        <StatusBar /> 
+        <StatusBar />
       </SafeAreaProvider>
     );
   }

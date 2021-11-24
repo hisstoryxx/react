@@ -7,7 +7,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@re
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
 import { ColorSchemeName, View, Text, Image, useWindowDimensions, Pressable } from 'react-native';
-import { Feather } from '@expo/vector-icons'; 
+import { Feather } from '@expo/vector-icons';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
@@ -39,30 +39,30 @@ const Stack = createStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen 
-        name="Home" 
-        component={HomeScreen} 
-        options={{ headerTitle: HomeHeader }} 
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerTitle: HomeHeader }}
       />
-      <Stack.Screen 
-        name="ChatRoom" 
-        component={ChatRoomScreen}         
-        options={({route}) => ({ 
-          headerTitle: () => < ChatRoomHeader id = {route.params?.id} />, 
+      <Stack.Screen
+        name="ChatRoom"
+        component={ChatRoomScreen}
+        options={({ route }) => ({
+          headerTitle: () => < ChatRoomHeader id={route.params?.id} />,
           headerBackTitleVisible: false,
-        })} 
+        })}
       />
-       <Stack.Screen name="GroupInfoScreen" component={GroupInfoScreen} />
-      <Stack.Screen 
-        name="UsersScreen" 
-        component={UsersScreen}         
-        options={{ 
+      <Stack.Screen name="GroupInfoScreen" component={GroupInfoScreen} />
+      <Stack.Screen
+        name="UsersScreen"
+        component={UsersScreen}
+        options={{
           title: "Users",
-        }} 
+        }}
       />
-      <Stack.Screen name = "Settings" component={SettingsScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      
+
     </Stack.Navigator>
   );
 }
@@ -72,25 +72,25 @@ const HomeHeader = (props) => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ 
+    <View style={{
       flexDirection: 'row',
-      justifyContent: 'space-between', 
+      justifyContent: 'space-between',
       width,
       padding: 10,
       alignItems: 'center',
     }}>
-      <Image 
-        source={{ uri: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.jpg'}}
-        style={{ width: 30, height: 30, borderRadius: 30}}
+      <Image
+        source={{ uri: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.jpg' }}
+        style={{ width: 30, height: 30, borderRadius: 30 }}
       />
-      <Text style={{flex: 1, textAlign: 'center', marginLeft: 50, fontWeight: 'bold'}}>Signal</Text>
-      
-      <Pressable onPress ={() => navigation.navigate('Settings')}>
-        <Feather name="settings" size={24} color="black" style={{ marginHorizontal: 10}} />
+      <Text style={{ flex: 1, textAlign: 'center', marginLeft: 50, fontWeight: 'bold' }}>Signal</Text>
+
+      <Pressable onPress={() => navigation.navigate('Settings')}>
+        <Feather name="settings" size={24} color="black" style={{ marginHorizontal: 10 }} />
       </Pressable>
-      
-      <Pressable onPress ={() => navigation.navigate('UsersScreen')}>
-        <Feather name="edit-2" size={24} color="black" style={{ marginHorizontal: 10}} />
+
+      <Pressable onPress={() => navigation.navigate('UsersScreen')}>
+        <Feather name="edit-2" size={24} color="black" style={{ marginHorizontal: 10 }} />
       </Pressable>
     </View>
   )
